@@ -1,45 +1,44 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
+ * GetPayIn Store - React Native Coding Challenge
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
+import React from 'react';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { store } from './src/store';
+import { queryClient, persister } from './src/utils/queryClient';
+import { AppNavigator } from './src/navigation';
+import { useNetworkStatus } from './src/hooks/useNetworkStatus';
+import { useAutoLock } from './src/hooks/useAutoLock';
 
 function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
+  useNetworkStatus();
+  useAutoLock();
 
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
+  return <AppNavigator />;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister }}
+        >
+          <SafeAreaProvider>
+            <StatusBar barStyle="dark-content" />
+            <AppContent />
+          </SafeAreaProvider>
+        </PersistQueryClientProvider>
+      </Provider>
+    </GestureHandlerRootView>
+  );
+}
 
 export default App;

@@ -1,97 +1,282 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# GetPayIn Store - React Native Coding Challenge
 
-# Getting Started
+A minimal 3-page e-commerce store application built with React Native, featuring authentication, auto-lock with biometric unlock, offline support, and product management.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🎯 Features
 
-## Step 1: Start Metro
+### ✅ Authentication
+- Login via DummyJSON API (`/auth/login`)
+- Session persistence with MMKV storage
+- Automatic session restoration on app launch with biometric prompt
+- Superadmin role designation (username: `emilys`)
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### 🔒 Auto-Lock & Biometric Security
+- **Auto-lock triggers:**
+  - After 10 seconds of inactivity
+  - When app goes to background
+- Biometric authentication (fingerprint/face unlock)
+- Password fallback when biometrics unavailable
+- Lock overlay obscures all content
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### 📦 Product Management
+- **All Products Screen:** Displays all products with thumbnail and title
+- **Specific Category Screen:** Shows products filtered by "beauty" category
+- Pull-to-refresh on both product screens
+- Superadmin can delete products (simulated deletion via API)
 
-```sh
-# Using npm
-npm start
+### 💾 Offline Support
+- React Query cache persisted to MMKV
+- Instant cached data on app relaunch (online or offline)
+- Offline indicator banner when disconnected
+- All cached product lists available offline
 
-# OR using Yarn
-yarn start
+### 🗂️ Tech Stack
+- **React Native** 0.82.0
+- **TypeScript** for type safety
+- **React Navigation** for routing (Stack & Bottom Tabs)
+- **React Query** for data fetching and caching
+- **MMKV** for persistent storage
+- **Redux Toolkit** for global state management
+- **Axios** for HTTP requests
+- **react-native-touch-id** for biometric authentication
+- **react-native-keychain** for secure credential storage
+- **@react-native-community/netinfo** for network detection
+
+## 📱 Screens
+
+### 1. Login Screen
+- Username/password input
+- Authenticates via DummyJSON `/auth/login`
+- Displays test credentials hint
+- Saves credentials for biometric fallback
+
+### 2. All Products Screen
+- Lists all products from `/products`
+- Shows thumbnail, title, price, and category
+- Pull-to-refresh support
+- **Superadmin only:** Delete button on each product
+- Displays "👑 Superadmin Mode" badge when logged in as superadmin
+
+### 3. Specific Category Screen (Beauty)
+- Lists products from `/products/category/beauty`
+- Same UI as All Products (without delete)
+- Pull-to-refresh support
+- Shows product count
+
+## 🚀 Setup & Installation
+
+### Prerequisites
+- Node.js >= 20
+- JDK 17 or 20
+- Android Studio with SDK Platform 36
+- Android device or emulator
+
+### Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd GPI/GPI
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set environment variables (Windows)**
+   ```powershell
+   # Set JAVA_HOME
+   $env:JAVA_HOME="C:\Program Files\Java\jdk-17"
+   
+   # Set ANDROID_HOME
+   $env:ANDROID_HOME="C:\Users\<YourUsername>\AppData\Local\Android\Sdk"
+   
+   # Update PATH
+   $env:PATH="$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:ANDROID_HOME\tools;$env:PATH"
+   ```
+
+4. **Start Metro bundler**
+   ```bash
+   npm start
+   ```
+
+5. **Run on Android** (in a new terminal)
+   ```bash
+   npm run android
+   ```
+
+## 🎮 Usage
+
+### Test Credentials
+```
+Username: emilys
+Password: emilyspass
+```
+**Note:** `emilys` is designated as the **superadmin** and can delete products.
+
+### Other Test Users
+You can also use any user from [DummyJSON users list](https://dummyjson.com/users):
+- Username: `michaelw`, Password: `michaelwpass`
+- Username: `sophiab`, Password: `sophiabpass`
+
+### Navigation
+- **All Products Tab:** Browse all products, delete as superadmin
+- **Beauty Tab:** Browse beauty category products
+- **Sign Out Tab:** Tap to sign out (with confirmation)
+
+### Testing Auto-Lock
+1. Login to the app
+2. Wait 10 seconds without interaction → App locks
+3. Or press home button to background app → App locks
+4. Unlock screen appears with biometric prompt
+
+### Testing Offline Mode
+1. Login and browse products
+2. Turn off WiFi/mobile data
+3. Close and reopen app
+4. Cached products still visible with offline banner
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/        # Reusable UI components
+│   ├── LockScreen.tsx
+│   ├── OfflineIndicator.tsx
+│   └── ProductCard.tsx
+├── hooks/            # Custom React hooks
+│   ├── useAuth.ts
+│   ├── useAutoLock.ts
+│   ├── useBiometrics.ts
+│   ├── useNetworkStatus.ts
+│   └── useProducts.ts
+├── navigation/       # React Navigation setup
+│   └── index.tsx
+├── screens/          # Screen components
+│   ├── AllProductsScreen.tsx
+│   ├── CategoryProductsScreen.tsx
+│   └── LoginScreen.tsx
+├── services/         # API integration
+│   └── api.ts
+├── store/           # Redux Toolkit store
+│   ├── appSlice.ts
+│   ├── authSlice.ts
+│   └── index.ts
+├── types/           # TypeScript type definitions
+│   └── index.ts
+└── utils/           # Utility functions
+    ├── queryClient.ts
+    └── storage.ts
 ```
 
-## Step 2: Build and run your app
+## 📋 Configuration Details
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Chosen Category
+**Beauty** - The Specific Category screen filters products from the "beauty" category.
 
-### Android
+### Superadmin User
+**Username:** `emilys` - This user has delete permissions on the All Products screen.
 
-```sh
-# Using npm
-npm run android
+### Cache Strategy
+- **React Query** with MMKV persistence
+- 24-hour garbage collection time
+- 5-minute stale time
+- Cache survives app restarts
+- Instant data display on relaunch
 
-# OR using Yarn
-yarn android
-```
+## ⚖️ Trade-offs & Decisions
 
-### iOS
+### What I Built
+✅ Clean, minimal UI focusing on functionality
+✅ Robust error handling for network failures
+✅ Efficient caching strategy with instant offline access
+✅ Simple but effective lock screen implementation
+✅ Proper TypeScript typing throughout
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+### What I Simplified
+- **No advanced animations** - Focused on core functionality over polish
+- **Basic UI styling** - Professional but minimal design
+- **Simulated delete** - DummyJSON returns `isDeleted` but doesn't persist
+- **Single category** - Only "beauty" category for the specific screen
+- **Basic error messages** - Simple alerts instead of toast notifications
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+### "If I Had More Time"
 
-```sh
-bundle install
-```
+#### Features
+- 🎨 **Dark mode support** - System theme detection and toggle
+- 🔍 **Search & filtering** - Search products by name, filter by price/rating
+- 📱 **Product details screen** - Full product view with images, reviews, specs
+- 🛒 **Shopping cart** - Add to cart, manage quantities
+- 📊 **Analytics** - Track user interactions, popular products
+- 🔄 **Optimistic updates** - Immediate UI feedback before API response
+- 📷 **Image caching** - Persist product images for true offline mode
+- 🌐 **i18n support** - Multi-language support
 
-Then, and every time you update your native dependencies, run:
+#### Technical Improvements
+- ⚡ **Code splitting** - Lazy load screens and components
+- 🧪 **Unit & E2E tests** - Jest, Testing Library, Detox
+- 📦 **CD/CI pipeline** - Automated builds and deployments
+- 🔐 **Enhanced security** - Encrypted storage, certificate pinning
+- 🎭 **Skeleton screens** - Loading placeholders instead of spinners
+- 🔄 **Pull-to-refresh animations** - Smooth, branded animations
+- 📈 **Performance monitoring** - React Native Performance, Sentry
+- 🎯 **Accessibility** - Screen reader support, high contrast mode
 
-```sh
-bundle exec pod install
-```
+#### Architecture
+- 🏗️ **Feature-based structure** - Organize by feature instead of type
+- 🔌 **Plugin system** - Modular feature additions
+- 📚 **Storybook** - Component documentation and testing
+- 🎨 **Design system** - Consistent UI components library
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## 🐛 Known Limitations
 
-```sh
-# Using npm
-npm run ios
+1. **Biometric fallback** - Password fallback uses Keychain, not a custom PIN
+2. **Delete persistence** - Deletes don't persist (DummyJSON limitation)
+3. **Network detection** - May have slight delay on connection changes
+4. **Auto-lock precision** - Timer resets on scroll, may extend beyond 10s with continuous interaction
+5. **Image caching** - Product images require network (not cached offline)
 
-# OR using Yarn
-yarn ios
-```
+## 📦 Dependencies Justification
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Core Dependencies
+- `@react-navigation/*` - Industry standard for React Native navigation
+- `@tanstack/react-query` - Best-in-class data fetching with caching
+- `react-native-mmkv` - Fastest key-value storage for React Native
+- `@reduxjs/toolkit` - Modern Redux with less boilerplate
+- `react-redux` - React bindings for Redux
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Feature Dependencies
+- `react-native-touch-id` - Simple biometric authentication (5.1k⭐)
+- `react-native-keychain` - Secure credential storage (3.1k⭐)
+- `@react-native-community/netinfo` - Official network detection
+- `axios` - Popular HTTP client with interceptors
+- `react-native-gesture-handler` - Better touch handling (6.2k⭐)
 
-## Step 3: Modify your app
+All dependencies are well-maintained, popular, and necessary for the requirements.
 
-Now that you have successfully run the app, let's make changes!
+## 🎯 Acceptance Checklist
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+- ✅ Login authenticates via DummyJSON
+- ✅ Token stored and applied to API requests
+- ✅ Session restored on launch with biometric prompt
+- ✅ Auto-lock after 10s inactivity
+- ✅ Auto-lock when app backgrounds
+- ✅ Lock overlay obscures all content
+- ✅ Biometric unlock works
+- ✅ Password fallback when biometrics unavailable
+- ✅ All Products screen renders with pull-to-refresh
+- ✅ Offline banner shows when disconnected
+- ✅ Specific Category screen shows filtered list
+- ✅ Superadmin can delete products (simulated)
+- ✅ React Query cache persists to MMKV
+- ✅ Cache rehydrates on cold start (instant lists)
+- ✅ Cached data available offline
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+## 📝 License
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+This project is created for the GetPayIn coding challenge.
 
-## Congratulations! :tada:
+---
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**Built with ❤️ using React Native**
