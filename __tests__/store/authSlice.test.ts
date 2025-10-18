@@ -1,21 +1,25 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { setCredentials, logout } from '../../src/store/authSlice';
-import { User } from '../../src/types';
+import { User, AuthState } from '../../src/types';
+
+type RootState = {
+  auth: AuthState;
+};
 
 describe('authSlice', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: ReturnType<typeof configureStore<RootState>>;
 
   beforeEach(() => {
     store = configureStore({
       reducer: {
         auth: authReducer,
       },
-    });
+    }) as ReturnType<typeof configureStore<RootState>>;
   });
 
   describe('initial state', () => {
     it('should have correct initial state', () => {
-      const state = store.getState().auth;
+      const state = store.getState().auth as AuthState;
       
       expect(state).toEqual({
         user: null,
@@ -42,7 +46,7 @@ describe('authSlice', () => {
 
       store.dispatch(setCredentials({ user, token }));
 
-      const state = store.getState().auth;
+      const state = store.getState().auth as AuthState;
       expect(state.user).toEqual(user);
       expect(state.token).toBe(token);
       expect(state.isAuthenticated).toBe(true);
@@ -64,7 +68,7 @@ describe('authSlice', () => {
 
       store.dispatch(setCredentials({ user: superadminUser, token }));
 
-      const state = store.getState().auth;
+      const state = store.getState().auth as AuthState;
       expect(state.user).toEqual(superadminUser);
       expect(state.token).toBe(token);
       expect(state.isAuthenticated).toBe(true);
@@ -86,7 +90,7 @@ describe('authSlice', () => {
 
       store.dispatch(setCredentials({ user: regularUser, token }));
 
-      const state = store.getState().auth;
+      const state = store.getState().auth as AuthState;
       expect(state.user).toEqual(regularUser);
       expect(state.token).toBe(token);
       expect(state.isAuthenticated).toBe(true);
@@ -110,7 +114,7 @@ describe('authSlice', () => {
       store.dispatch(setCredentials({ user, token: 'mock-token' }));
 
       // Verify state is set
-      let state = store.getState().auth;
+      let state = store.getState().auth as AuthState;
       expect(state.isAuthenticated).toBe(true);
       expect(state.user).toEqual(user);
 
@@ -118,7 +122,7 @@ describe('authSlice', () => {
       store.dispatch(logout());
 
       // Verify state is cleared
-      state = store.getState().auth;
+      state = store.getState().auth as AuthState;
       expect(state.user).toBeNull();
       expect(state.token).toBeNull();
       expect(state.isAuthenticated).toBe(false);
@@ -127,14 +131,14 @@ describe('authSlice', () => {
 
     it('should handle logout when already logged out', () => {
       // Ensure initial state
-      let state = store.getState().auth;
+      let state = store.getState().auth as AuthState;
       expect(state.isAuthenticated).toBe(false);
 
       // Dispatch logout
       store.dispatch(logout());
 
       // State should remain unchanged
-      state = store.getState().auth;
+      state = store.getState().auth as AuthState;
       expect(state.user).toBeNull();
       expect(state.token).toBeNull();
       expect(state.isAuthenticated).toBe(false);
@@ -166,24 +170,24 @@ describe('authSlice', () => {
 
       // Login user1
       store.dispatch(setCredentials({ user: user1, token: 'token1' }));
-      let state = store.getState().auth;
+      let state = store.getState().auth as AuthState;
       expect(state.user).toEqual(user1);
       expect(state.isSuperadmin).toBe(false);
 
       // Logout
       store.dispatch(logout());
-      state = store.getState().auth;
+      state = store.getState().auth as AuthState;
       expect(state.isAuthenticated).toBe(false);
 
       // Login user2 (superadmin)
       store.dispatch(setCredentials({ user: user2, token: 'token2' }));
-      state = store.getState().auth;
+      state = store.getState().auth as AuthState;
       expect(state.user).toEqual(user2);
       expect(state.isSuperadmin).toBe(true);
 
       // Logout again
       store.dispatch(logout());
-      state = store.getState().auth;
+      state = store.getState().auth as AuthState;
       expect(state.isAuthenticated).toBe(false);
     });
   });

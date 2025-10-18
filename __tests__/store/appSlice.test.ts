@@ -1,20 +1,25 @@
 import { configureStore } from '@reduxjs/toolkit';
 import appReducer, { setLocked, setOnline, setSelectedCategory } from '../../src/store/appSlice';
+import { AppState } from '../../src/types';
+
+type RootState = {
+  app: AppState;
+};
 
 describe('appSlice', () => {
-  let store: ReturnType<typeof configureStore>;
+  let store: ReturnType<typeof configureStore<RootState>>;
 
   beforeEach(() => {
     store = configureStore({
       reducer: {
         app: appReducer,
       },
-    });
+    }) as ReturnType<typeof configureStore<RootState>>;
   });
 
   describe('initial state', () => {
     it('should have correct initial state', () => {
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       
       expect(state).toEqual({
         isLocked: false,
@@ -28,7 +33,7 @@ describe('appSlice', () => {
     it('should set locked state to true', () => {
       store.dispatch(setLocked(true));
 
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.isLocked).toBe(true);
     });
 
@@ -39,7 +44,7 @@ describe('appSlice', () => {
 
       // Then unlock
       store.dispatch(setLocked(false));
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.isLocked).toBe(false);
     });
   });
@@ -48,14 +53,14 @@ describe('appSlice', () => {
     it('should set online state to true', () => {
       store.dispatch(setOnline(true));
 
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.isOnline).toBe(true);
     });
 
     it('should set online state to false', () => {
       store.dispatch(setOnline(false));
 
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.isOnline).toBe(false);
     });
 
@@ -80,7 +85,7 @@ describe('appSlice', () => {
     it('should set selected category', () => {
       store.dispatch(setSelectedCategory('electronics'));
 
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.selectedCategory).toBe('electronics');
     });
 
@@ -101,7 +106,7 @@ describe('appSlice', () => {
 
       categories.forEach(category => {
         store.dispatch(setSelectedCategory(category));
-        const state = store.getState().app;
+        const state = store.getState().app as AppState;
         expect(state.selectedCategory).toBe(category);
       });
     });
@@ -114,7 +119,7 @@ describe('appSlice', () => {
       store.dispatch(setOnline(false));
       store.dispatch(setSelectedCategory('electronics'));
 
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.isLocked).toBe(true);
       expect(state.isOnline).toBe(false);
       expect(state.selectedCategory).toBe('electronics');
@@ -129,7 +134,7 @@ describe('appSlice', () => {
       // Change only one state
       store.dispatch(setOnline(true));
 
-      const state = store.getState().app;
+      const state = store.getState().app as AppState;
       expect(state.isLocked).toBe(true); // Should remain unchanged
       expect(state.isOnline).toBe(true); // Should be updated
       expect(state.selectedCategory).toBe('books'); // Should remain unchanged
