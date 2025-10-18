@@ -1,0 +1,45 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/HOW_TO_ADD_FONTS.txt",
+      "sha1": "8c81acba466290ad8dce7625e6bbdc12dbef7afd"
+    },
+    {
+      "path": "assets/fonts/README.md",
+      "sha1": "2eb05dea506040cd8470310e502aa527a038d840"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-Bold.ttf",
+      "sha1": "c85f33bc4a1416a8909d8fde4bd28fd8cbd30d86"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-BoldItalic.ttf",
+      "sha1": "b40d7aabefc3cea6b117dfa0735cec13532d0f59"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-Italic.ttf",
+      "sha1": "f20fd48590916361fe3bff4a259b55ebc2e5736f"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-Light.ttf",
+      "sha1": "719afa6b3290c47d3ef42288d5ee9d255bb8a509"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-LightItalic.ttf",
+      "sha1": "36c625196161e2501a1b7d7d27f5e96b9356c9b9"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-Medium.ttf",
+      "sha1": "249d1f77b186bcd1f9af12001c760ebf1e9f9bdf"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-MediumItalic.ttf",
+      "sha1": "116b7b4e678a038eddd25ced32f8b4d095dac19f"
+    },
+    {
+      "path": "assets/fonts/Ubuntu-Regular.ttf",
+      "sha1": "c1f6487b64a85c144bc0357832fc79b905dfbcb1"
+    }
+  ]
+}

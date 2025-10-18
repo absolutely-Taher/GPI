@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity, Text, Alert, View, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAppSelector } from '../store';
 import { useLogout, useRestoreSession } from '../hooks/useAuth';
@@ -10,6 +10,7 @@ import { LoginScreen } from '../screens/LoginScreen';
 import { AllProductsScreen } from '../screens/AllProductsScreen';
 import { CategoryProductsScreen } from '../screens/CategoryProductsScreen';
 import { LockScreen } from '../components/LockScreen';
+import { CustomDialog } from '../components/CustomDialog';
 import { getItem, getObject } from '../utils/storage';
 import { RootStackParamList, AuthStackParamList, MainTabParamList } from '../types';
 import { useTheme } from '../theme/ThemeContext';
@@ -28,26 +29,43 @@ const AuthNavigator = () => {
 
 const SignOutScreen = () => {
   const logout = useLogout();
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+    setShowDialog(true);
   }, []);
 
-  return null;
+  const handleSignOut = async () => {
+    setShowDialog(false);
+    await logout();
+  };
+
+  const handleCancel = () => {
+    setShowDialog(false);
+  };
+
+  return (
+    <CustomDialog
+      visible={showDialog}
+      title="Sign Out"
+      message="Are you sure you want to sign out? You'll need to login again to access your account."
+      icon="logout"
+      iconColor="#FF9500"
+      buttons={[
+        {
+          text: 'Cancel',
+          onPress: handleCancel,
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          onPress: handleSignOut,
+          style: 'destructive',
+        },
+      ]}
+      onDismiss={handleCancel}
+    />
+  );
 };
 
 const AllProductsHeaderTitle = () => {
@@ -90,7 +108,7 @@ const MainNavigator = () => {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
-          fontFamily: 'Ubuntu',
+          fontFamily: 'Ubuntu-Bold',
         },
         headerStyle: {
           backgroundColor: theme.primary,
@@ -101,7 +119,7 @@ const MainNavigator = () => {
         headerTitleStyle: {
           fontWeight: '700',
           fontSize: 20,
-          fontFamily: 'Ubuntu',
+          fontFamily: 'Ubuntu-Bold',
         },
         headerRight: () => (
           <TouchableOpacity
@@ -209,7 +227,7 @@ const headerStyles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 20,
     fontWeight: '700',
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
   superadminBadge: {
     marginTop: 4,
@@ -221,6 +239,6 @@ const headerStyles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '600',
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
 });

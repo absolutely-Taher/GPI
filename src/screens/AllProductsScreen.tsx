@@ -7,15 +7,17 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { useAllProducts, useDeleteProduct } from '../hooks/useProducts';
 import { useAppSelector } from '../store';
 import { ProductCard } from '../components/ProductCard';
+import { CustomDialog } from '../components/CustomDialog';
 import { OfflineIndicator } from '../components/OfflineIndicator';
 import { Product } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { resetActivityTimer } from '../hooks/useAutoLock';
+
+type DialogType = 'offline' | 'success' | 'error' | null;
 
 export const AllProductsScreen: React.FC = () => {
   const { data, isLoading, refetch, isFetching } = useAllProducts();
@@ -24,15 +26,14 @@ export const AllProductsScreen: React.FC = () => {
   const { isOnline } = useAppSelector((state) => state.app);
   const { theme } = useTheme();
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [dialogType, setDialogType] = useState<DialogType>(null);
+  const [dialogMessage, setDialogMessage] = useState('');
 
   const handleDelete = (productId: number) => {
     // Prevent delete when offline
     if (!isOnline) {
-      Alert.alert(
-        '📡 Offline',
-        'Delete is not available while offline. Please connect to the internet and try again.',
-        [{ text: 'OK', style: 'default' }]
-      );
+      setDialogType('offline');
+      setDialogMessage('Delete is not available while offline. Please connect to the internet and try again.');
       return;
     }
 
@@ -45,11 +46,8 @@ export const AllProductsScreen: React.FC = () => {
         setDeletingId(null);
         
         // Show success message
-        Alert.alert(
-          '✅ Success',
-          `Product deleted successfully${data.isDeleted ? ' (simulated)' : ''}`,
-          [{ text: 'OK', style: 'default' }]
-        );
+        setDialogType('success');
+        setDialogMessage(`Product deleted successfully${data.isDeleted ? ' (simulated)' : ''}!`);
       },
       onError: (error: any) => {
         console.error('Failed to delete product:', error);
@@ -58,15 +56,19 @@ export const AllProductsScreen: React.FC = () => {
         // Show error message with better network error detection
         const isNetworkError = error.message === 'Network Error' || !error.response;
         
-        Alert.alert(
-          '❌ Delete Failed',
+        setDialogType('error');
+        setDialogMessage(
           isNetworkError 
             ? 'Network error. Please check your internet connection and try again.'
-            : error.response?.data?.message || error.message || 'Failed to delete product. Please try again.',
-          [{ text: 'OK', style: 'default' }]
+            : error.response?.data?.message || error.message || 'Failed to delete product. Please try again.'
         );
       },
     });
+  };
+
+  const closeDialog = () => {
+    setDialogType(null);
+    setDialogMessage('');
   };
 
   const renderItem = ({ item }: { item: Product }) => (
@@ -105,6 +107,37 @@ export const AllProductsScreen: React.FC = () => {
     );
   };
 
+  const getDialogProps = () => {
+    switch (dialogType) {
+      case 'offline':
+        return {
+          title: 'Offline',
+          icon: 'wifi-off',
+          iconColor: '#FF9500',
+        };
+      case 'success':
+        return {
+          title: 'Success',
+          icon: 'check-circle',
+          iconColor: '#34C759',
+        };
+      case 'error':
+        return {
+          title: 'Error',
+          icon: 'alert-circle',
+          iconColor: '#FF3B30',
+        };
+      default:
+        return {
+          title: '',
+          icon: 'information',
+          iconColor: theme.primary,
+        };
+    }
+  };
+
+  const dialogProps = getDialogProps();
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <OfflineIndicator />
@@ -123,6 +156,23 @@ export const AllProductsScreen: React.FC = () => {
             tintColor={theme.primary}
           />
         }
+      />
+
+      {/* Status Dialogs */}
+      <CustomDialog
+        visible={dialogType !== null}
+        title={dialogProps.title}
+        message={dialogMessage}
+        icon={dialogProps.icon}
+        iconColor={dialogProps.iconColor}
+        buttons={[
+          {
+            text: 'OK',
+            onPress: closeDialog,
+            style: 'default',
+          },
+        ]}
+        onDismiss={closeDialog}
       />
     </View>
   );
@@ -145,13 +195,13 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Regular',
     fontWeight: '400',
   },
   emptyText: {
     fontSize: 18,
     marginBottom: 20,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Medium',
     fontWeight: '500',
   },
   retryButton: {
@@ -163,7 +213,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
 });
 

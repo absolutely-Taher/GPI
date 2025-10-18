@@ -1,17 +1,17 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Product } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { CustomDialog } from './CustomDialog';
 
 interface ProductCardProps {
   product: Product;
@@ -27,6 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isDeleting = false,
 }) => {
   const { theme } = useTheme();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -47,21 +48,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   }, []);
 
   const handleDelete = () => {
-    Alert.alert(
-      'Delete Product',
-      `Are you sure you want to delete "${product.title}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            console.log('Delete confirmed for product:', product.id);
-            onDelete?.(product.id);
-          },
-        },
-      ]
-    );
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    console.log('Delete confirmed for product:', product.id);
+    setShowDeleteDialog(false);
+    onDelete?.(product.id);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteDialog(false);
   };
 
   return (
@@ -109,6 +106,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </View>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <CustomDialog
+        visible={showDeleteDialog}
+        title="Delete Product"
+        message={`Are you sure you want to delete "${product.title}"? This action cannot be undone.`}
+        icon="delete-alert"
+        iconColor="#FF3B30"
+        buttons={[
+          {
+            text: 'Cancel',
+            onPress: cancelDelete,
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            onPress: confirmDelete,
+            style: 'destructive',
+          },
+        ]}
+        onDismiss={cancelDelete}
+      />
     </Animated.View>
   );
 };
@@ -143,19 +162,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 4,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
   category: {
     fontSize: 13,
     textTransform: 'capitalize',
     marginBottom: 6,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Regular',
     fontWeight: '400',
   },
   price: {
     fontSize: 18,
     fontWeight: '700',
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
   deleteButton: {
     justifyContent: 'center',

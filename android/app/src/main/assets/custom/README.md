@@ -1,24 +1,23 @@
 # Ubuntu Font Setup
 
-## ✅ Status: FONTS INSTALLED
+## Download Ubuntu Fonts
 
-All Ubuntu font files have been downloaded and linked to the project.
+1. Go to: https://fonts.google.com/specimen/Ubuntu
+2. Click "Get font" then "Download all"
+3. Extract the downloaded ZIP file
+4. Copy these font files to this directory (`assets/fonts/`):
 
-### Installed Font Files:
+### Required Font Files:
 ```
-✓ Ubuntu-Light.ttf
-✓ Ubuntu-Regular.ttf
-✓ Ubuntu-Medium.ttf
-✓ Ubuntu-Bold.ttf
-✓ Ubuntu-LightItalic.ttf
-✓ Ubuntu-Italic.ttf
-✓ Ubuntu-MediumItalic.ttf
-✓ Ubuntu-BoldItalic.ttf
+Ubuntu-Light.ttf
+Ubuntu-Regular.ttf
+Ubuntu-Medium.ttf
+Ubuntu-Bold.ttf
+Ubuntu-LightItalic.ttf
+Ubuntu-Italic.ttf
+Ubuntu-MediumItalic.ttf
+Ubuntu-BoldItalic.ttf
 ```
-
-Fonts have been automatically linked to:
-- Android: `android/app/src/main/assets/fonts/`
-- iOS: Xcode project
 
 ## After Adding Fonts
 

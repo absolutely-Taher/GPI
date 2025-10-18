@@ -1,0 +1,75 @@
+========================================
+UBUNTU FONT SETUP - STEP BY STEP
+========================================
+
+STEP 1: DOWNLOAD UBUNTU FONTS
+------------------------------
+1. Open your browser
+2. Go to: https://fonts.google.com/specimen/Ubuntu
+3. Click the "Get font" button (top right)
+4. Click "Download all" 
+5. A ZIP file will download (Ubuntu.zip)
+
+STEP 2: EXTRACT AND COPY
+-------------------------
+1. Extract the Ubuntu.zip file
+2. Inside, find the "static" folder
+3. Copy these 8 files to THIS directory (assets/fonts/):
+
+   ✓ Ubuntu-Light.ttf
+   ✓ Ubuntu-LightItalic.ttf
+   ✓ Ubuntu-Regular.ttf
+   ✓ Ubuntu-Italic.ttf
+   ✓ Ubuntu-Medium.ttf
+   ✓ Ubuntu-MediumItalic.ttf
+   ✓ Ubuntu-Bold.ttf
+   ✓ Ubuntu-BoldItalic.ttf
+
+STEP 3: LINK FONTS TO APP
+--------------------------
+Open terminal in project root and run:
+
+   npx react-native-asset
+
+STEP 4: REBUILD APP
+-------------------
+Clean and rebuild:
+
+   cd android
+   ./gradlew clean
+   cd ..
+   npx react-native run-android
+
+========================================
+VERIFICATION
+========================================
+
+After rebuild, the app should show:
+✓ Modern, clean typography
+✓ Consistent font across all screens
+✓ Professional appearance
+
+If fonts don't load, app will gracefully 
+fall back to system font (still works fine).
+
+========================================
+TROUBLESHOOTING
+========================================
+
+Fonts still not showing?
+
+1. Verify 8 .ttf files are in assets/fonts/
+2. Check react-native.config.js exists in root
+3. Re-run: npx react-native-asset
+4. Clear cache: npx react-native start --reset-cache
+5. Rebuild completely
+
+========================================
+NEED HELP?
+========================================
+
+See SETUP_FONTS_AND_ICONS.md in project root
+for detailed troubleshooting guide.
+
+========================================
+

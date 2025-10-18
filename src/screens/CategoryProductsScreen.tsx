@@ -90,11 +90,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 4,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
   productCount: {
     fontSize: 14,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Regular',
     fontWeight: '400',
   },
   listContent: {
@@ -110,13 +110,13 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Regular',
     fontWeight: '400',
   },
   emptyText: {
     fontSize: 18,
     marginBottom: 20,
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Medium',
     fontWeight: '500',
   },
   retryButton: {
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu-Bold',
   },
 });
 
