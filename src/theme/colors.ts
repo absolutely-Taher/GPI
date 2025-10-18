@@ -1,73 +1,99 @@
+// Modern retail design tokens - brand green (#006B35) + paper neutrals (#FFFef9)
+// Font family: Ubuntu (weights: 300=Light, 400=Regular, 500=Medium, 700=Bold)
 export const lightTheme = {
-  primary: '#007AFF',
-  secondary: '#5856D6',
-  background: '#F5F5F5',
+  fontFamily: 'Ubuntu',
+  primary: '#006B35',
+  primaryAlt: '#0A7A45',
+  secondary: '#006B35',
+  background: '#FFFef9',
   surface: '#FFFFFF',
-  text: '#000000',
-  textSecondary: '#666666',
-  textTertiary: '#999999',
-  border: '#E0E0E0',
-  error: '#FF3B30',
-  success: '#34C759',
-  warning: '#FF9500',
-  info: '#007AFF',
+  surfaceAlt: '#FFFBF1',
+  text: '#0E0E0C',
+  textSecondary: '#5F5F5F',
+  textTertiary: '#C2C2C2',
+  border: '#E7E2D9',
+  borderStrong: '#CFCAC0',
+  error: '#D64545',
+  success: '#1F8E57',
+  warning: '#B38F00',
+  info: '#006B35',
+  muted: '#C2C2C2',
   
   // Card colors
   card: '#FFFFFF',
-  cardShadow: '#000',
+  cardShadow: 'rgba(17,24,39,0.12)',
+  outline: '#E7E2D9',
   
   // Lock screen
   lockOverlay: 'rgba(0, 0, 0, 0.95)',
   lockText: '#FFFFFF',
   
   // Badge
-  superadminBadge: '#FFD700',
-  superadminText: '#000000',
+  superadminBadge: 'rgba(0,107,53,0.15)',
+  superadminText: '#006B35',
   
   // Offline
-  offlineBanner: '#FF9500',
+  offlineBanner: '#B38F00',
   offlineText: '#FFFFFF',
   
   // Input
   inputBackground: '#FFFFFF',
-  inputBorder: '#E0E0E0',
-  inputPlaceholder: '#999999',
+  inputBorder: '#E7E2D9',
+  inputPlaceholder: '#C2C2C2',
+  
+  // Radii
+  radiusXl: 24,
+  radiusLg: 16,
+  radiusMd: 12,
+  radiusSm: 8,
 };
 
 export const darkTheme = {
-  primary: '#0A84FF',
-  secondary: '#5E5CE6',
-  background: '#000000',
-  surface: '#1C1C1E',
-  text: '#FFFFFF',
-  textSecondary: '#EBEBF5',
-  textTertiary: '#EBEBF599',
-  border: '#38383A',
-  error: '#FF453A',
-  success: '#32D74B',
-  warning: '#FF9F0A',
-  info: '#0A84FF',
+  fontFamily: 'Ubuntu',
+  primary: '#27A065',
+  primaryAlt: '#19C47A',
+  secondary: '#27A065',
+  background: '#0A0F0D',
+  surface: '#0F1714',
+  surfaceAlt: '#14211B',
+  text: '#FFFef9',
+  textSecondary: '#C2C2C2',
+  textTertiary: '#8F8F8F',
+  border: '#1E2A24',
+  borderStrong: '#26362E',
+  error: '#F07070',
+  success: '#31B277',
+  warning: '#C8A52A',
+  info: '#27A065',
+  muted: '#8F8F8F',
   
   // Card colors
-  card: '#1C1C1E',
-  cardShadow: '#000',
+  card: '#0F1714',
+  cardShadow: 'rgba(0,0,0,0.50)',
+  outline: '#1E2A24',
   
   // Lock screen
   lockOverlay: 'rgba(0, 0, 0, 0.98)',
-  lockText: '#FFFFFF',
+  lockText: '#FFFef9',
   
   // Badge
-  superadminBadge: '#FFD60A',
-  superadminText: '#000000',
+  superadminBadge: 'rgba(39,160,101,0.20)',
+  superadminText: '#27A065',
   
   // Offline
-  offlineBanner: '#FF9F0A',
+  offlineBanner: '#C8A52A',
   offlineText: '#000000',
   
   // Input
-  inputBackground: '#2C2C2E',
-  inputBorder: '#48484A',
-  inputPlaceholder: '#EBEBF599',
+  inputBackground: '#14211B',
+  inputBorder: '#1E2A24',
+  inputPlaceholder: '#8F8F8F',
+  
+  // Radii
+  radiusXl: 24,
+  radiusLg: 16,
+  radiusMd: 12,
+  radiusSm: 8,
 };
 
 export type Theme = typeof lightTheme;

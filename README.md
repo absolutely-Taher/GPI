@@ -65,7 +65,15 @@ A minimal 3-page e-commerce store application built with React Native, featuring
 
 ## 🚀 Setup & Installation
 
-### Prerequisites
+> **📖 For detailed setup and running instructions, see [RUN_APP_GUIDE.md](./RUN_APP_GUIDE.md)**
+>
+> This comprehensive guide includes:
+> - ✅ Complete one-time setup (fixing `adb` issues permanently)
+> - ✅ Step-by-step instructions for running the app every time
+> - ✅ Troubleshooting for all common issues
+> - ✅ Quick commands cheatsheet
+
+### Quick Start (Prerequisites)
 - Node.js >= 20
 - JDK 17 or 20
 - Android Studio with SDK Platform 36
@@ -84,7 +92,7 @@ A minimal 3-page e-commerce store application built with React Native, featuring
    npm install
    ```
 
-3. **Set environment variables (Windows)**
+3. **Set environment variables (Windows)** - See [RUN_APP_GUIDE.md](./RUN_APP_GUIDE.md) for detailed instructions
    ```powershell
    # Set JAVA_HOME
    $env:JAVA_HOME="C:\Program Files\Java\jdk-17"

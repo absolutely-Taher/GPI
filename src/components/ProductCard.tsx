@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Product } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -68,24 +69,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: theme.card,
-          borderColor: theme.border,
+          backgroundColor: theme.surface,
+          borderColor: theme.outline || theme.border,
           opacity: fadeAnim,
           transform: [{ scale: scaleAnim }],
+          shadowColor: theme.cardShadow,
         },
         isDeleting && styles.containerDeleting,
       ]}
     >
-      <Image source={{ uri: product.thumbnail }} style={styles.image} />
+      <Image 
+        source={{ uri: product.thumbnail }} 
+        style={[styles.image, { backgroundColor: theme.surfaceAlt || theme.background }]} 
+      />
       <View style={styles.content}>
         <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
           {product.title}
         </Text>
-        <Text style={[styles.price, { color: theme.primary }]}>
-          ${product.price.toFixed(2)}
-        </Text>
         <Text style={[styles.category, { color: theme.textSecondary }]}>
           {product.category}
+        </Text>
+        <Text style={[styles.price, { color: theme.primary }]}>
+          ${product.price.toFixed(2)}
         </Text>
       </View>
       {showDelete && (
@@ -93,8 +98,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {isDeleting ? (
             <ActivityIndicator size="small" color={theme.error} />
           ) : (
-            <TouchableOpacity onPress={handleDelete}>
-              <Text style={styles.deleteText}>🗑️</Text>
+            <TouchableOpacity 
+              onPress={handleDelete}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              accessibilityLabel={`Delete ${product.title}`}
+              accessibilityRole="button"
+            >
+              <Icon name="delete-outline" size={26} color={theme.error} />
             </TouchableOpacity>
           )}
         </View>
@@ -106,25 +116,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderRadius: 12,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginVertical: 8,
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 6,
     borderWidth: 1,
   },
   containerDeleting: {
     opacity: 0.5,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    backgroundColor: '#F0F0F0',
+    width: 72,
+    height: 72,
+    borderRadius: 12,
   },
   content: {
     flex: 1,
@@ -133,25 +141,28 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 4,
+    fontFamily: 'Ubuntu',
+  },
+  category: {
+    fontSize: 13,
+    textTransform: 'capitalize',
+    marginBottom: 6,
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   price: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  category: {
-    fontSize: 12,
-    textTransform: 'capitalize',
+    fontWeight: '700',
+    fontFamily: 'Ubuntu',
   },
   deleteButton: {
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,
-  },
-  deleteText: {
-    fontSize: 24,
+    minWidth: 44,
+    minHeight: 44,
   },
 });
 

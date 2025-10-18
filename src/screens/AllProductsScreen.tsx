@@ -152,10 +152,14 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   emptyText: {
     fontSize: 18,
     marginBottom: 20,
+    fontFamily: 'Ubuntu',
+    fontWeight: '500',
   },
   retryButton: {
     paddingHorizontal: 24,
@@ -166,6 +170,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Ubuntu',
   },
   superadminBadge: {
     position: 'absolute',
@@ -183,6 +188,7 @@ const styles = StyleSheet.create({
   superadminText: {
     fontSize: 12,
     fontWeight: 'bold',
+    fontFamily: 'Ubuntu',
   },
 });
 

@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TouchableOpacity, Text, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAppSelector } from '../store';
 import { useLogout, useRestoreSession } from '../hooks/useAuth';
 import { LoginScreen } from '../screens/LoginScreen';
@@ -51,29 +52,54 @@ const SignOutScreen = () => {
 
 const MainNavigator = () => {
   const { theme, toggleTheme, isDark } = useTheme();
+  const { isSuperadmin } = useAppSelector((state) => state.auth);
   
   return (
     <MainTab.Navigator
       screenOptions={{
         tabBarActiveTintColor: theme.primary,
-        tabBarInactiveTintColor: theme.textTertiary,
+        tabBarInactiveTintColor: theme.muted || theme.textTertiary,
         tabBarStyle: {
           backgroundColor: theme.surface,
-          borderTopColor: theme.border,
+          borderTopColor: theme.outline || theme.border,
+          borderTopWidth: 1,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+          fontFamily: 'Ubuntu',
         },
         headerStyle: {
-          backgroundColor: theme.surface,
+          backgroundColor: theme.primary,
+          elevation: 0,
+          shadowOpacity: 0,
         },
-        headerTintColor: theme.text,
+        headerTintColor: '#FFFFFF',
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: '700',
+          fontSize: 20,
+          fontFamily: 'Ubuntu',
         },
         headerRight: () => (
           <TouchableOpacity
             onPress={toggleTheme}
-            style={{ marginRight: 15, padding: 8 }}
+            style={{ 
+              marginRight: 16, 
+              padding: 8,
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              borderRadius: 20,
+              minWidth: 44,
+              minHeight: 44,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            accessibilityLabel={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+            accessibilityRole="button"
           >
-            <Text style={{ fontSize: 24 }}>{isDark ? '☀️' : '🌙'}</Text>
+            <Icon name={isDark ? 'weather-sunny' : 'weather-night'} size={22} color="#FFFFFF" />
           </TouchableOpacity>
         ),
       }}
@@ -82,18 +108,18 @@ const MainNavigator = () => {
         name="AllProducts"
         component={AllProductsScreen}
         options={{
-          title: 'All Products',
-          tabBarLabel: 'All Products',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🛍️</Text>,
+          title: isSuperadmin ? 'All Products 👑' : 'All Products',
+          tabBarLabel: 'All',
+          tabBarIcon: ({ color }) => <Icon name="shopping" size={24} color={color} />,
         }}
       />
       <MainTab.Screen
         name="CategoryProducts"
         component={CategoryProductsScreen}
         options={{
-          title: 'Beauty Products',
+          title: 'Beauty',
           tabBarLabel: 'Beauty',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>💄</Text>,
+          tabBarIcon: ({ color }) => <Icon name="lipstick" size={24} color={color} />,
         }}
       />
       <MainTab.Screen
@@ -102,7 +128,7 @@ const MainNavigator = () => {
         options={{
           title: 'Sign Out',
           tabBarLabel: 'Sign Out',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🚪</Text>,
+          tabBarIcon: ({ color }) => <Icon name="logout" size={24} color={color} />,
         }}
         listeners={({ navigation }) => ({
           tabPress: (e) => {

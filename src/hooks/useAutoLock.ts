@@ -10,10 +10,7 @@ const globalLastActivityTime = { current: Date.now() };
 
 // Global function to reset timer
 export const resetActivityTimer = () => {
-  const now = Date.now();
-  const timeSinceLast = now - globalLastActivityTime.current;
-  console.log('👆 Activity detected! Time since last:', timeSinceLast, 'ms');
-  globalLastActivityTime.current = now;
+  globalLastActivityTime.current = Date.now();
 };
 
 export const useAutoLock = () => {
@@ -37,7 +34,6 @@ export const useAutoLock = () => {
     if (isAuthenticated && !isLocked) {
       // Reset the timer when the app becomes unlocked
       globalLastActivityTime.current = Date.now();
-      console.log('🔓 App unlocked - resetting activity timer');
     }
   }, [isAuthenticated, isLocked]);
 
@@ -52,7 +48,6 @@ export const useAutoLock = () => {
       const timeSinceActivity = Date.now() - globalLastActivityTime.current;
       
       if (timeSinceActivity >= LOCK_TIMEOUT && isAuthenticatedRef.current && !isLockedRef.current) {
-        console.log('🔒 Locking app - no activity for', timeSinceActivity, 'ms');
         dispatch(setLocked(true));
         if (intervalRef.current) {
           clearInterval(intervalRef.current);

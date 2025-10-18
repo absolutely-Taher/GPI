@@ -90,9 +90,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 4,
+    fontFamily: 'Ubuntu',
   },
   productCount: {
     fontSize: 14,
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   listContent: {
     paddingVertical: 8,
@@ -107,10 +110,14 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   emptyText: {
     fontSize: 18,
     marginBottom: 20,
+    fontFamily: 'Ubuntu',
+    fontWeight: '500',
   },
   retryButton: {
     paddingHorizontal: 24,
@@ -121,6 +128,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Ubuntu',
   },
 });
 

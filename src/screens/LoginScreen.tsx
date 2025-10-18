@@ -11,6 +11,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useLogin } from '../hooks/useAuth';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -18,7 +19,7 @@ export const LoginScreen: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { mutate: login, isPending, error } = useLogin();
-  const { theme } = useTheme();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -63,61 +64,85 @@ export const LoginScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.content}>
-          <Text style={styles.logo}>🛍️</Text>
-          <Text style={[styles.title, { color: theme.text }]}>GetPayIn Store</Text>
-          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Login to continue</Text>
+        {/* Header with brand green gradient simulation */}
+        <View style={[styles.header, { backgroundColor: theme.primary }]}>
+          <TouchableOpacity
+            onPress={toggleTheme}
+            style={styles.themeToggle}
+            accessibilityLabel={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+            accessibilityRole="button"
+          >
+            <Icon name={isDark ? 'weather-sunny' : 'weather-night'} size={22} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.headerContent}>
+            <Icon name="shopping" size={64} color="#FFFFFF" />
+            <Text style={styles.headerTitle}>GetPayIn Store</Text>
+          </View>
+        </View>
 
-          <View style={styles.form}>
-            <TextInput
-              style={[styles.input, { 
-                backgroundColor: theme.inputBackground, 
-                borderColor: theme.inputBorder,
-                color: theme.text 
-              }]}
-              placeholder="Username"
-              placeholderTextColor={theme.inputPlaceholder}
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isPending}
-            />
+        {/* Form Card */}
+        <View style={styles.formContainer}>
+          <View style={[styles.formCard, { 
+            backgroundColor: theme.surface,
+            shadowColor: theme.cardShadow,
+            borderColor: theme.outline || theme.border,
+          }]}>
+            <Text style={[styles.title, { color: theme.text }]}>Welcome Back</Text>
+            <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Login to continue shopping</Text>
 
-            <TextInput
-              style={[styles.input, { 
-                backgroundColor: theme.inputBackground, 
-                borderColor: theme.inputBorder,
-                color: theme.text 
-              }]}
-              placeholder="Password"
-              placeholderTextColor={theme.inputPlaceholder}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isPending}
-              onSubmitEditing={handleLogin}
-            />
+            <View style={styles.form}>
+              <TextInput
+                style={[styles.input, { 
+                  backgroundColor: theme.inputBackground, 
+                  borderColor: theme.inputBorder,
+                  color: theme.text 
+                }]}
+                placeholder="Username"
+                placeholderTextColor={theme.inputPlaceholder}
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isPending}
+              />
 
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.primary }, isPending && styles.buttonDisabled]}
-              onPress={handleLogin}
-              disabled={isPending}
-            >
-              {isPending ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text style={styles.buttonText}>Login</Text>
-              )}
-            </TouchableOpacity>
+              <TextInput
+                style={[styles.input, { 
+                  backgroundColor: theme.inputBackground, 
+                  borderColor: theme.inputBorder,
+                  color: theme.text 
+                }]}
+                placeholder="Password"
+                placeholderTextColor={theme.inputPlaceholder}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isPending}
+                onSubmitEditing={handleLogin}
+              />
 
-            <View style={[styles.hint, { backgroundColor: theme.primary + '20' }]}>
-              <Text style={[styles.hintText, { color: theme.primary }]}>💡 Test credentials:</Text>
-              <Text style={[styles.hintText, { color: theme.primary }]}>Username: emilys</Text>
-              <Text style={[styles.hintText, { color: theme.primary }]}>Password: emilyspass</Text>
-              <Text style={[styles.hintTextSmall, { color: theme.textSecondary }]}>(emilys is superadmin)</Text>
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: theme.primary }, isPending && styles.buttonDisabled]}
+                onPress={handleLogin}
+                disabled={isPending}
+                accessibilityLabel="Login"
+                accessibilityRole="button"
+              >
+                {isPending ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Login</Text>
+                )}
+              </TouchableOpacity>
+
+              <View style={[styles.hint, { backgroundColor: (theme.surfaceAlt || theme.background), borderColor: theme.outline || theme.border }]}>
+                <Text style={[styles.hintText, { color: theme.textSecondary }]}>💡 Test credentials:</Text>
+                <Text style={[styles.hintText, { color: theme.text, fontWeight: '600' }]}>Username: emilys</Text>
+                <Text style={[styles.hintText, { color: theme.text, fontWeight: '600' }]}>Password: emilyspass</Text>
+                <Text style={[styles.hintTextSmall, { color: theme.textSecondary }]}>(emilys is superadmin)</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -133,42 +158,81 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
   },
-  content: {
-    flex: 1,
+  header: {
+    height: 200,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    justifyContent: 'flex-end',
+    paddingBottom: 32,
+  },
+  themeToggle: {
+    position: 'absolute',
+    top: 48,
+    right: 16,
+    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 20,
+    minWidth: 44,
+    minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    zIndex: 1,
   },
-  logo: {
-    fontSize: 80,
-    marginBottom: 20,
+  headerContent: {
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginTop: 12,
+  },
+  formContainer: {
+    marginTop: -40,
+    paddingHorizontal: 16,
+  },
+  formCard: {
+    borderRadius: 24,
+    padding: 24,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 6,
+    borderWidth: 1,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontFamily: 'Ubuntu',
   },
   subtitle: {
     fontSize: 16,
-    marginBottom: 40,
+    marginBottom: 24,
+    textAlign: 'center',
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   form: {
     width: '100%',
-    maxWidth: 400,
   },
   input: {
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
     marginBottom: 16,
     borderWidth: 1,
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   button: {
-    borderRadius: 10,
+    borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 8,
+    minHeight: 52,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -176,21 +240,27 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
+    fontFamily: 'Ubuntu',
   },
   hint: {
-    marginTop: 30,
+    marginTop: 24,
     padding: 16,
-    borderRadius: 10,
+    borderRadius: 12,
+    borderWidth: 1,
   },
   hintText: {
     fontSize: 14,
     marginBottom: 4,
+    fontFamily: 'Ubuntu',
+    fontWeight: '400',
   },
   hintTextSmall: {
     fontSize: 12,
     marginTop: 4,
     fontStyle: 'italic',
+    fontFamily: 'Ubuntu',
+    fontWeight: '300',
   },
 });
 
