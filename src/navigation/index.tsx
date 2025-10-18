@@ -11,6 +11,7 @@ import { CategoryProductsScreen } from '../screens/CategoryProductsScreen';
 import { LockScreen } from '../components/LockScreen';
 import { getItem, getObject } from '../utils/storage';
 import { RootStackParamList, AuthStackParamList, MainTabParamList } from '../types';
+import { useTheme } from '../theme/ThemeContext';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
@@ -36,7 +37,9 @@ const SignOutScreen = () => {
         {
           text: 'Sign Out',
           style: 'destructive',
-          onPress: logout,
+          onPress: async () => {
+            await logout();
+          },
         },
       ],
       { cancelable: true }
@@ -47,18 +50,32 @@ const SignOutScreen = () => {
 };
 
 const MainNavigator = () => {
+  const { theme, toggleTheme, isDark } = useTheme();
+  
   return (
     <MainTab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
-        headerStyle: {
-          backgroundColor: '#FFFFFF',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textTertiary,
+        tabBarStyle: {
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
         },
-        headerTintColor: '#000000',
+        headerStyle: {
+          backgroundColor: theme.surface,
+        },
+        headerTintColor: theme.text,
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={toggleTheme}
+            style={{ marginRight: 15, padding: 8 }}
+          >
+            <Text style={{ fontSize: 24 }}>{isDark ? '☀️' : '🌙'}</Text>
+          </TouchableOpacity>
+        ),
       }}
     >
       <MainTab.Screen
@@ -102,6 +119,7 @@ export const AppNavigator = () => {
   const { isAuthenticated, token } = useAppSelector((state) => state.auth);
   const { isLocked } = useAppSelector((state) => state.app);
   const { mutate: restoreSession } = useRestoreSession();
+  const { theme, isDark } = useTheme();
 
   useEffect(() => {
     // Check for existing session on app start

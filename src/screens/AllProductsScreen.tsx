@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,37 +7,74 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useAllProducts, useDeleteProduct } from '../hooks/useProducts';
 import { useAppSelector } from '../store';
 import { ProductCard } from '../components/ProductCard';
 import { OfflineIndicator } from '../components/OfflineIndicator';
 import { Product } from '../types';
-import { useAutoLock } from '../hooks/useAutoLock';
+import { useTheme } from '../theme/ThemeContext';
+import { resetActivityTimer } from '../hooks/useAutoLock';
 
 export const AllProductsScreen: React.FC = () => {
   const { data, isLoading, refetch, isFetching } = useAllProducts();
-  const { mutate: deleteProduct } = useDeleteProduct();
+  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
   const { isSuperadmin } = useAppSelector((state) => state.auth);
-  const { resetTimer } = useAutoLock();
+  const { isOnline } = useAppSelector((state) => state.app);
+  const { theme } = useTheme();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handleDelete = (productId: number) => {
+    // Prevent delete when offline
+    if (!isOnline) {
+      Alert.alert(
+        '📡 Offline',
+        'Delete is not available while offline. Please connect to the internet and try again.',
+        [{ text: 'OK', style: 'default' }]
+      );
+      return;
+    }
+
+    console.log('handleDelete called with productId:', productId);
+    setDeletingId(productId);
+    
     deleteProduct(productId, {
-      onSuccess: () => {
-        // Product deleted successfully (simulated)
+      onSuccess: (data) => {
+        console.log('Product deleted successfully:', data);
+        setDeletingId(null);
+        
+        // Show success message
+        Alert.alert(
+          '✅ Success',
+          `Product deleted successfully${data.isDeleted ? ' (simulated)' : ''}`,
+          [{ text: 'OK', style: 'default' }]
+        );
+      },
+      onError: (error: any) => {
+        console.error('Failed to delete product:', error);
+        setDeletingId(null);
+        
+        // Show error message with better network error detection
+        const isNetworkError = error.message === 'Network Error' || !error.response;
+        
+        Alert.alert(
+          '❌ Delete Failed',
+          isNetworkError 
+            ? 'Network error. Please check your internet connection and try again.'
+            : error.response?.data?.message || error.message || 'Failed to delete product. Please try again.',
+          [{ text: 'OK', style: 'default' }]
+        );
       },
     });
-  };
-
-  const handleScroll = () => {
-    resetTimer();
   };
 
   const renderItem = ({ item }: { item: Product }) => (
     <ProductCard
       product={item}
-      showDelete={isSuperadmin}
+      showDelete={isSuperadmin && isOnline}
       onDelete={handleDelete}
+      isDeleting={deletingId === item.id}
     />
   );
 
@@ -45,16 +82,23 @@ export const AllProductsScreen: React.FC = () => {
     if (isLoading) {
       return (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading products...</Text>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
+            Loading products...
+          </Text>
         </View>
       );
     }
 
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.emptyText}>No products found</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
+        <Text style={[styles.emptyText, { color: theme.textTertiary }]}>
+          No products found
+        </Text>
+        <TouchableOpacity
+          style={[styles.retryButton, { backgroundColor: theme.primary }]}
+          onPress={() => refetch()}
+        >
           <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
       </View>
@@ -62,27 +106,29 @@ export const AllProductsScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <OfflineIndicator />
-      <FlatList
-        data={data?.products || []}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={renderEmpty}
-        refreshControl={
-          <RefreshControl
-            refreshing={isFetching && !isLoading}
-            onRefresh={refetch}
-            tintColor="#007AFF"
+          <FlatList
+            data={data?.products || []}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.listContent}
+            ListEmptyComponent={renderEmpty}
+            onScroll={resetActivityTimer}
+            scrollEventThrottle={400}
+            refreshControl={
+              <RefreshControl
+                refreshing={isFetching && !isLoading}
+                onRefresh={refetch}
+                tintColor={theme.primary}
+              />
+            }
           />
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={400}
-      />
       {isSuperadmin && (
-        <View style={styles.superadminBadge}>
-          <Text style={styles.superadminText}>👑 Superadmin Mode</Text>
+        <View style={[styles.superadminBadge, { backgroundColor: theme.superadminBadge }]}>
+          <Text style={[styles.superadminText, { color: theme.superadminText }]}>
+            👑 Superadmin Mode
+          </Text>
         </View>
       )}
     </View>
@@ -92,7 +138,6 @@ export const AllProductsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   listContent: {
     paddingVertical: 8,
@@ -107,15 +152,12 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666666',
   },
   emptyText: {
     fontSize: 18,
-    color: '#999999',
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#007AFF',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -129,7 +171,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: '#FFD700',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -140,7 +181,6 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   superadminText: {
-    color: '#000000',
     fontSize: 12,
     fontWeight: 'bold',
   },

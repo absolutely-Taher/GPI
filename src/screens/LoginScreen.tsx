@@ -12,31 +12,42 @@ import {
   Alert,
 } from 'react-native';
 import { useLogin } from '../hooks/useAuth';
-import { useBiometrics } from '../hooks/useBiometrics';
+import { useTheme } from '../theme/ThemeContext';
 
 export const LoginScreen: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { mutate: login, isPending, error } = useLogin();
-  const { savePassword } = useBiometrics();
+  const { theme } = useTheme();
 
   const handleLogin = async () => {
     if (!username || !password) {
-      Alert.alert('Error', 'Please enter both username and password');
+      Alert.alert(
+        '⚠️ Error',
+        'Please enter both username and password',
+        [{ text: 'OK', style: 'default' }]
+      );
       return;
     }
+
+    console.log('=== LOGIN ATTEMPT FROM SCREEN ===');
+    console.log('Username:', username);
+    console.log('Password length:', password.length);
 
     login(
       { username, password },
       {
-        onSuccess: async () => {
-          // Save password for biometric fallback
-          await savePassword(username, password);
+        onSuccess: (data) => {
+          console.log('=== LOGIN SUCCESS CALLBACK IN SCREEN ===');
+          console.log('Login completed successfully');
         },
         onError: (err: any) => {
+          console.log('=== LOGIN FAILED ===');
+          console.error('Login error:', err);
           Alert.alert(
-            'Login Failed',
-            err.response?.data?.message || 'Invalid credentials'
+            '❌ Login Failed',
+            err.response?.data?.message || 'Invalid credentials. Please try again.',
+            [{ text: 'OK', style: 'default' }]
           );
         },
       }
@@ -46,7 +57,7 @@ export const LoginScreen: React.FC = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.background }]}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -54,13 +65,18 @@ export const LoginScreen: React.FC = () => {
       >
         <View style={styles.content}>
           <Text style={styles.logo}>🛍️</Text>
-          <Text style={styles.title}>GetPayIn Store</Text>
-          <Text style={styles.subtitle}>Login to continue</Text>
+          <Text style={[styles.title, { color: theme.text }]}>GetPayIn Store</Text>
+          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Login to continue</Text>
 
           <View style={styles.form}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.inputBackground, 
+                borderColor: theme.inputBorder,
+                color: theme.text 
+              }]}
               placeholder="Username"
+              placeholderTextColor={theme.inputPlaceholder}
               value={username}
               onChangeText={setUsername}
               autoCapitalize="none"
@@ -69,8 +85,13 @@ export const LoginScreen: React.FC = () => {
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { 
+                backgroundColor: theme.inputBackground, 
+                borderColor: theme.inputBorder,
+                color: theme.text 
+              }]}
               placeholder="Password"
+              placeholderTextColor={theme.inputPlaceholder}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -81,7 +102,7 @@ export const LoginScreen: React.FC = () => {
             />
 
             <TouchableOpacity
-              style={[styles.button, isPending && styles.buttonDisabled]}
+              style={[styles.button, { backgroundColor: theme.primary }, isPending && styles.buttonDisabled]}
               onPress={handleLogin}
               disabled={isPending}
             >
@@ -92,11 +113,11 @@ export const LoginScreen: React.FC = () => {
               )}
             </TouchableOpacity>
 
-            <View style={styles.hint}>
-              <Text style={styles.hintText}>💡 Test credentials:</Text>
-              <Text style={styles.hintText}>Username: emilys</Text>
-              <Text style={styles.hintText}>Password: emilyspass</Text>
-              <Text style={styles.hintTextSmall}>(emilys is superadmin)</Text>
+            <View style={[styles.hint, { backgroundColor: theme.primary + '20' }]}>
+              <Text style={[styles.hintText, { color: theme.primary }]}>💡 Test credentials:</Text>
+              <Text style={[styles.hintText, { color: theme.primary }]}>Username: emilys</Text>
+              <Text style={[styles.hintText, { color: theme.primary }]}>Password: emilyspass</Text>
+              <Text style={[styles.hintTextSmall, { color: theme.textSecondary }]}>(emilys is superadmin)</Text>
             </View>
           </View>
         </View>
@@ -108,7 +129,6 @@ export const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   scrollContent: {
     flexGrow: 1,
@@ -126,12 +146,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#000000',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666666',
     marginBottom: 40,
   },
   form: {
@@ -139,17 +157,14 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   },
   input: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
   },
   button: {
-    backgroundColor: '#007AFF',
     borderRadius: 10,
     paddingVertical: 16,
     alignItems: 'center',
@@ -166,17 +181,14 @@ const styles = StyleSheet.create({
   hint: {
     marginTop: 30,
     padding: 16,
-    backgroundColor: '#E8F4FF',
     borderRadius: 10,
   },
   hintText: {
     fontSize: 14,
-    color: '#007AFF',
     marginBottom: 4,
   },
   hintTextSmall: {
     fontSize: 12,
-    color: '#666666',
     marginTop: 4,
     fontStyle: 'italic',
   },

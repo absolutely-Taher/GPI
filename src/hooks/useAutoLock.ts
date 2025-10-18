@@ -1,29 +1,75 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setLocked } from '../store/appSlice';
 
 const LOCK_TIMEOUT = 10000; // 10 seconds
 
+// Global ref for activity time - shared across all hook instances
+const globalLastActivityTime = { current: Date.now() };
+
+// Global function to reset timer
+export const resetActivityTimer = () => {
+  const now = Date.now();
+  const timeSinceLast = now - globalLastActivityTime.current;
+  console.log('👆 Activity detected! Time since last:', timeSinceLast, 'ms');
+  globalLastActivityTime.current = now;
+};
+
 export const useAutoLock = () => {
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { isLocked } = useAppSelector((state) => state.app);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const appState = useRef(AppState.currentState);
+  
+  // Store latest values in refs to avoid recreation
+  const isAuthenticatedRef = useRef(isAuthenticated);
+  const isLockedRef = useRef(isLocked);
+  
+  useEffect(() => {
+    isAuthenticatedRef.current = isAuthenticated;
+    isLockedRef.current = isLocked;
+  }, [isAuthenticated, isLocked]);
 
-  const resetTimer = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+  // Reset activity time when unlocking
+  useEffect(() => {
+    if (isAuthenticated && !isLocked) {
+      // Reset the timer when the app becomes unlocked
+      globalLastActivityTime.current = Date.now();
+      console.log('🔓 App unlocked - resetting activity timer');
+    }
+  }, [isAuthenticated, isLocked]);
+
+  // Check periodically if we should lock
+  useEffect(() => {
+    if (!isAuthenticated || isLocked) {
+      return;
     }
 
-    if (isAuthenticated) {
-      timerRef.current = setTimeout(() => {
+    // Check every second if enough time has passed since last activity
+    intervalRef.current = setInterval(() => {
+      const timeSinceActivity = Date.now() - globalLastActivityTime.current;
+      
+      if (timeSinceActivity >= LOCK_TIMEOUT && isAuthenticatedRef.current && !isLockedRef.current) {
+        console.log('🔒 Locking app - no activity for', timeSinceActivity, 'ms');
         dispatch(setLocked(true));
-      }, LOCK_TIMEOUT);
-    }
-  };
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      }
+    }, 1000); // Check every second
 
-  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isAuthenticated, isLocked, dispatch]);
+
+  const handleAppStateChange = useCallback((nextAppState: AppStateStatus) => {
     if (
       appState.current.match(/active/) &&
       nextAppState.match(/inactive|background/)
@@ -31,17 +77,23 @@ export const useAutoLock = () => {
       // App went to background - lock immediately
       if (isAuthenticated) {
         dispatch(setLocked(true));
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
       }
     } else if (
       appState.current.match(/inactive|background/) &&
       nextAppState === 'active'
     ) {
-      // App came to foreground - reset timer
-      resetTimer();
+      // App came to foreground - reset activity time if unlocked
+      if (!isLocked) {
+        globalLastActivityTime.current = Date.now();
+      }
     }
 
     appState.current = nextAppState;
-  };
+  }, [isAuthenticated, isLocked, dispatch]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(
@@ -49,17 +101,11 @@ export const useAutoLock = () => {
       handleAppStateChange
     );
 
-    // Start timer on mount
-    resetTimer();
-
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
       subscription.remove();
     };
-  }, [isAuthenticated]);
+  }, [handleAppStateChange]);
 
-  return { resetTimer };
+  return { resetTimer: resetActivityTimer };
 };
 

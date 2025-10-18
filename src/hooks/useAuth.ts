@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import * as Keychain from 'react-native-keychain';
 import { authApi } from '../services/api';
 import { useAppDispatch } from '../store';
 import { setCredentials, logout as logoutAction } from '../store/authSlice';
@@ -10,7 +11,11 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
-    onSuccess: (data) => {
+    onSuccess: async (data, variables) => {
+      console.log('=== useLogin onSuccess ===');
+      console.log('Login data:', data);
+      console.log('Login variables:', variables);
+      
       const user: User = {
         id: data.id,
         username: data.username,
@@ -25,6 +30,22 @@ export const useLogin = () => {
       setItem('auth_token', data.accessToken);
       setObject('user_data', user);
 
+      // Save password to keychain for biometric fallback
+      console.log('Saving credentials to keychain from useLogin...');
+      try {
+        await Keychain.setGenericPassword(variables.username, variables.password);
+        console.log('Credentials saved to keychain successfully from useLogin');
+        
+        // Verify the save
+        const verification = await Keychain.getGenericPassword();
+        if (verification) {
+          console.log('Verification from useLogin - username:', verification.username);
+          console.log('Verification from useLogin - password length:', verification.password.length);
+        }
+      } catch (error) {
+        console.error('Failed to save credentials to keychain from useLogin:', error);
+      }
+
       // Update Redux state
       dispatch(setCredentials({ user, token: data.accessToken }));
     },
@@ -34,10 +55,19 @@ export const useLogin = () => {
 export const useLogout = () => {
   const dispatch = useAppDispatch();
 
-  return () => {
+  return async () => {
+    console.log('=== LOGOUT ===');
     // Clear storage
     removeItem('auth_token');
     removeItem('user_data');
+
+    // Clear keychain credentials
+    try {
+      await Keychain.resetGenericPassword();
+      console.log('Keychain credentials cleared');
+    } catch (error) {
+      console.error('Failed to clear keychain:', error);
+    }
 
     // Update Redux state
     dispatch(logoutAction());

@@ -13,17 +13,14 @@ import { useAppSelector } from '../store';
 import { ProductCard } from '../components/ProductCard';
 import { OfflineIndicator } from '../components/OfflineIndicator';
 import { Product } from '../types';
-import { useAutoLock } from '../hooks/useAutoLock';
+import { useTheme } from '../theme/ThemeContext';
+import { resetActivityTimer } from '../hooks/useAutoLock';
 
 export const CategoryProductsScreen: React.FC = () => {
   const { selectedCategory } = useAppSelector((state) => state.app);
   const { data, isLoading, refetch, isFetching } =
     useCategoryProducts(selectedCategory);
-  const { resetTimer } = useAutoLock();
-
-  const handleScroll = () => {
-    resetTimer();
-  };
+  const { theme } = useTheme();
 
   const renderItem = ({ item }: { item: Product }) => (
     <ProductCard product={item} />
@@ -33,16 +30,16 @@ export const CategoryProductsScreen: React.FC = () => {
     if (isLoading) {
       return (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading products...</Text>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading products...</Text>
         </View>
       );
     }
 
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.emptyText}>No products found</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
+        <Text style={[styles.emptyText, { color: theme.textTertiary }]}>No products found</Text>
+        <TouchableOpacity style={[styles.retryButton, { backgroundColor: theme.primary }]} onPress={() => refetch()}>
           <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
       </View>
@@ -50,14 +47,14 @@ export const CategoryProductsScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <OfflineIndicator />
-      <View style={styles.header}>
-        <Text style={styles.categoryTitle}>
+      <View style={[styles.header, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+        <Text style={[styles.categoryTitle, { color: theme.text }]}>
           {selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}{' '}
           Products
         </Text>
-        <Text style={styles.productCount}>
+        <Text style={[styles.productCount, { color: theme.textSecondary }]}>
           {data?.total || 0} {data?.total === 1 ? 'item' : 'items'}
         </Text>
       </View>
@@ -67,15 +64,15 @@ export const CategoryProductsScreen: React.FC = () => {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={renderEmpty}
+        onScroll={resetActivityTimer}
+        scrollEventThrottle={400}
         refreshControl={
           <RefreshControl
             refreshing={isFetching && !isLoading}
             onRefresh={refetch}
-            tintColor="#007AFF"
+            tintColor={theme.primary}
           />
         }
-        onScroll={handleScroll}
-        scrollEventThrottle={400}
       />
     </View>
   );
@@ -84,23 +81,18 @@ export const CategoryProductsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#FFFFFF',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
   categoryTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000000',
     marginBottom: 4,
   },
   productCount: {
     fontSize: 14,
-    color: '#666666',
   },
   listContent: {
     paddingVertical: 8,
@@ -115,15 +107,12 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666666',
   },
   emptyText: {
     fontSize: 18,
-    color: '#999999',
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#007AFF',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
