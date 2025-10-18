@@ -137,12 +137,6 @@ export const LoginScreen: React.FC = () => {
                 )}
               </TouchableOpacity>
 
-              <View style={[styles.hint, { backgroundColor: (theme.surfaceAlt || theme.background), borderColor: theme.outline || theme.border }]}>
-                <Text style={[styles.hintText, { color: theme.textSecondary }]}>💡 Test credentials:</Text>
-                <Text style={[styles.hintText, { color: theme.text, fontWeight: '600' }]}>Username: emilys</Text>
-                <Text style={[styles.hintText, { color: theme.text, fontWeight: '600' }]}>Password: emilyspass</Text>
-                <Text style={[styles.hintTextSmall, { color: theme.textSecondary }]}>(emilys is superadmin)</Text>
-              </View>
             </View>
           </View>
         </View>
@@ -188,7 +182,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   formContainer: {
-    marginTop: -40,
+    marginTop: -20,
     paddingHorizontal: 16,
   },
   formCard: {

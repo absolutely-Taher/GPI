@@ -108,29 +108,22 @@ export const AllProductsScreen: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <OfflineIndicator />
-          <FlatList
-            data={data?.products || []}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={styles.listContent}
-            ListEmptyComponent={renderEmpty}
-            onScroll={resetActivityTimer}
-            scrollEventThrottle={400}
-            refreshControl={
-              <RefreshControl
-                refreshing={isFetching && !isLoading}
-                onRefresh={refetch}
-                tintColor={theme.primary}
-              />
-            }
+      <FlatList
+        data={data?.products || []}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={renderEmpty}
+        onScroll={resetActivityTimer}
+        scrollEventThrottle={400}
+        refreshControl={
+          <RefreshControl
+            refreshing={isFetching && !isLoading}
+            onRefresh={refetch}
+            tintColor={theme.primary}
           />
-      {isSuperadmin && (
-        <View style={[styles.superadminBadge, { backgroundColor: theme.superadminBadge }]}>
-          <Text style={[styles.superadminText, { color: theme.superadminText }]}>
-            👑 Superadmin Mode
-          </Text>
-        </View>
-      )}
+        }
+      />
     </View>
   );
 };
@@ -170,24 +163,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'Ubuntu',
-  },
-  superadminBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 4,
-  },
-  superadminText: {
-    fontSize: 12,
-    fontWeight: 'bold',
     fontFamily: 'Ubuntu',
   },
 });

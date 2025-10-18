@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity, Text, Alert } from 'react-native';
+import { TouchableOpacity, Text, Alert, View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAppSelector } from '../store';
 import { useLogout, useRestoreSession } from '../hooks/useAuth';
@@ -48,6 +48,26 @@ const SignOutScreen = () => {
   }, []);
 
   return null;
+};
+
+const AllProductsHeaderTitle = () => {
+  const { isSuperadmin } = useAppSelector((state) => state.auth);
+  const { theme } = useTheme();
+  
+  return (
+    <View style={headerStyles.headerTitleContainer}>
+      <Text style={headerStyles.headerTitleText}>
+        All Products
+      </Text>
+      {isSuperadmin && (
+        <View style={[headerStyles.superadminBadge, { backgroundColor: 'rgba(255,255,255,0.25)' }]}>
+          <Text style={headerStyles.superadminText}>
+             Superadmin Mode
+          </Text>
+        </View>
+      )}
+    </View>
+  );
 };
 
 const MainNavigator = () => {
@@ -108,7 +128,7 @@ const MainNavigator = () => {
         name="AllProducts"
         component={AllProductsScreen}
         options={{
-          title: isSuperadmin ? 'All Products 👑' : 'All Products',
+          headerTitle: () => <AllProductsHeaderTitle />,
           tabBarLabel: 'All',
           tabBarIcon: ({ color }) => <Icon name="shopping" size={24} color={color} />,
         }}
@@ -180,3 +200,27 @@ export const AppNavigator = () => {
   );
 };
 
+const headerStyles = StyleSheet.create({
+  headerTitleContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitleText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '700',
+    fontFamily: 'Ubuntu',
+  },
+  superadminBadge: {
+    marginTop: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  superadminText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+    fontFamily: 'Ubuntu',
+  },
+});
